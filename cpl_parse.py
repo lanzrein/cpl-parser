@@ -20,10 +20,11 @@ def main(domain_file, cpl_file):
         trees.close()
 
     for domain in domain_list:
+        domain = domain.strip('\n')
         print(domain)
         root = Node(domain)
-        buildTree(root, domain)
-
+        buildTree(root, domain,0)
+        
         with open("cpl_domain_trees.txt", 'a+') as trees:
             for pre, _, node in RenderTree(root):
                 trees.write("%s%s" % (pre, node.name))
@@ -32,14 +33,15 @@ def main(domain_file, cpl_file):
             print(' tree written in ./cpl_domain_trees.txt\n')
 
 
-def buildTree(node, rel_root):
+def buildTree(node, rel_root, depth, max_depth=10):
     '''
 	builds tree down from given relative root node and writes it to output file
 
 	Input: rel_root (string)
 	Output: N/A
 	'''
-
+    if depth >= max_depth:
+        return
     results = getSupers(rel_root)
     _results = getSupers('"' + rel_root + '"')
     for _result in _results:
@@ -49,7 +51,7 @@ def buildTree(node, rel_root):
     while results:
         for result in results:
             tempNode = Node(result, parent=node)
-            buildTree(tempNode, result)
+            buildTree(tempNode, result, depth+1)
         results = []
 
 
